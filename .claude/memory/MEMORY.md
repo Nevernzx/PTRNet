@@ -1,0 +1,2 @@
+- [Breast Cancer LN Metastasis Prediction](project_breast_cancer_task.md) — Patient-level classification using multi-sequence breast MRI, Xiangya data, 648 patients
+- [MRI Data Directory Structure](project_mri_data_structure.md) — /data/MRI_data layout: Xiangya 656 patients + supplement + 4 multi-center hospitals, naming inconsistencies

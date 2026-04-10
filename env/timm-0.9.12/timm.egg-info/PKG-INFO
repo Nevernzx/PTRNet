@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: timm
 Version: 0.9.12
 Summary: PyTorch Image Models
@@ -27,6 +27,17 @@ Requires-Dist: torchvision
 Requires-Dist: pyyaml
 Requires-Dist: huggingface_hub
 Requires-Dist: safetensors
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 # PyTorch Image Models
 - [What's New](#whats-new)
