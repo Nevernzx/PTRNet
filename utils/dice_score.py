@@ -2,10 +2,39 @@ import torch
 from torch import Tensor
 
 
-def dice_coeff(input: Tensor, target: Tensor, reduce_batch_first: bool = False, epsilon: float = 1e-6):
+def _apply_valid_mask(input: Tensor, target: Tensor, valid_mask: Tensor = None):
+    if valid_mask is None:
+        return input, target
+
+    valid_mask = valid_mask.to(device=input.device)
+    if valid_mask.dtype != torch.bool:
+        valid_mask = valid_mask > 0
+    valid_mask = valid_mask.reshape(-1)
+
+    if input.dim() < 3:
+        raise ValueError("valid_mask is only supported for batched 2D masks.")
+    if input.shape[0] != valid_mask.shape[0]:
+        raise ValueError(
+            f"valid_mask length {valid_mask.shape[0]} does not match batch dimension {input.shape[0]}."
+        )
+
+    return input[valid_mask], target[valid_mask]
+
+
+def dice_coeff(
+    input: Tensor,
+    target: Tensor,
+    reduce_batch_first: bool = False,
+    epsilon: float = 1e-6,
+    valid_mask: Tensor = None,
+):
     # Average of Dice coefficient for all batches, or for a single mask
     assert input.size() == target.size()
     assert input.dim() == 3 or not reduce_batch_first
+
+    input, target = _apply_valid_mask(input, target, valid_mask=valid_mask)
+    if input.numel() == 0:
+        return input.new_tensor(0.0)
 
     sum_dim = (-1, -2) if input.dim() == 2 or not reduce_batch_first else (-1, -2, -3)
 
@@ -17,13 +46,27 @@ def dice_coeff(input: Tensor, target: Tensor, reduce_batch_first: bool = False, 
     return dice.mean()
 
 
-def multiclass_dice_coeff(input: Tensor, target: Tensor, reduce_batch_first: bool = False, epsilon: float = 1e-6):
+def multiclass_dice_coeff(
+    input: Tensor,
+    target: Tensor,
+    reduce_batch_first: bool = False,
+    epsilon: float = 1e-6,
+    valid_mask: Tensor = None,
+):
     # Average of Dice coefficient for all classes
-    return dice_coeff(input.flatten(0, 1), target.flatten(0, 1), reduce_batch_first, epsilon)
+    input, target = _apply_valid_mask(input, target, valid_mask=valid_mask)
+    if input.numel() == 0:
+        return input.new_tensor(0.0)
+    return dice_coeff(
+        input.flatten(0, 1),
+        target.flatten(0, 1),
+        reduce_batch_first,
+        epsilon,
+    )
 
 
-def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False):
+def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False, valid_mask: Tensor = None):
     # Dice loss (objective to minimize) between 0 and 1
     fn = multiclass_dice_coeff if multiclass else dice_coeff
-    return 1 - fn(input, target, reduce_batch_first=True) # origin
+    return 1 - fn(input, target, reduce_batch_first=True, valid_mask=valid_mask)
     # return 1 - fn(input, target, reduce_batch_first=False)

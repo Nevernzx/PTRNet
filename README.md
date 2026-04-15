@@ -44,13 +44,13 @@ pip install -e .
 - **Train**
 ```bash
 conda activate PTRNet
-python scripts/train_modality_ablation.py --saveName modality_ablation --model_mode union --d_model 256
+python scripts/train_mri.py --saveName mri_biomedclip --model_mode image --d_model 256
 ```
 
 - **Test**
 ```bash
 conda activate PTRNet
-python scripts/test.py --saveName modality_ablation --model_mode union --d_model 256 --weight_path log/modality_ablation/model_final.pt
+python scripts/test.py --saveName mri_biomedclip --model_mode image --d_model 256 --weight_path log/mri_biomedclip/model_final.pt
 ```
 
 - **Ablation**
