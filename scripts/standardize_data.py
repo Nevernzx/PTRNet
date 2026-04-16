@@ -61,42 +61,82 @@ STANDARD_SEQUENCES = [
 SEQUENCE_MAP = {
     # T1 variants
     "T1": "T1", "T1WI": "T1", "T1Wi": "T1",
+    "T1-FSE": "T1",
+    "T1WI_jpeg": "T1", "T1_jpeg": "T1",
+    "VIBRANT-T1WI": "T1", "VIBRANT T1WI": "T1",
+    "T1WI-VIBRANT": "T1", "3D AX VIBRANT T1WI": "T1",
     # T2 variants
     "T2": "T2", "T2WI": "T2", "t2WI": "T2",
+    "T2-WATER": "T2", "T2_WATER": "T2", "WATER": "T2", "WATER-T2": "T2",
+    "T2-FAT": "T2", "T2_FAT": "T2", "FAT-T2": "T2",
+    "FAT": "T2", "-WATER": "T2",
+    "T2WI_jpeg": "T2", "T2_jpeg": "T2",
     # ADC variants
     "ADC": "ADC", "adc": "ADC", "ＡＤＣ": "ADC",
     # DWI variants
     "DWI": "DWI", "dwi": "DWI", "DW": "DWI",
+    "DWI_jpeg": "DWI",
+    "MUSE-B800": "DWI", "MUSE B800": "DWI", "MUSE": "DWI",
+    "FOCUS-MUSE-B800": "DWI", "FOCUS MUSE": "DWI", "FOCUS_MUSE-B800": "DWI",
+    "AX FOCUS MUSE B800": "DWI", "AX-MUSE": "DWI", "AX-MUSE-B800": "DWI",
+    "DW-SYNTHETIC": "DWI", "DW-SYTHETIC": "DWI", "DW-SYNTHECTIC": "DWI",
+    "DYN-SYNTHETIC-B800": "DWI",
+    # Dixon T1 water-only → T1 (closest to conventional T1)
+    "T1_W": "T1", "T1 W": "T1",
     # DCE1
     "D1": "DCE1", "增强1": "DCE1", "T1-DYN1": "DCE1", "T1-DYNA1": "DCE1",
     "动态增强1": "DCE1", "zengqiang１": "DCE1", "zq1": "DCE1", "T1-D1": "DCE1",
     "PH1": "DCE1",
+    "D1_jpeg": "DCE1",
+    "VIBRANT-EXCITATION": "DCE1", "VIBRANT-WATER-EXCITATION": "DCE1",
+    "VIBRANT-WATER": "DCE1", "VIBRANT WATER": "DCE1",
+    "VIBRANT WATER EXCITATION": "DCE1",
+    "3D AX VIBRANT WATER EXCITATION": "DCE1",
+    "PH1-VIBRANT-WATER-EXCITATION": "DCE1",
+    "VIBNRANT-WATER-EXCITATION": "DCE1",
+    "PH1-1": "DCE1",
+    "CT-ZQ1": "DCE1", "CT1": "DCE1",
     # DCE2
     "D2": "DCE2", "增强2": "DCE2", "T1-DYN2": "DCE2", "T1-DYNA2": "DCE2",
     "动态增强2": "DCE2", "zengqiang２": "DCE2", "zq2": "DCE2", "T1-D2": "DCE2",
     "PH2": "DCE2",
+    "D2_jpeg": "DCE2",
+    "CT-ZQ2": "DCE2", "CT2": "DCE2",
     # DCE3
     "D3": "DCE3", "增强3": "DCE3", "T1-DYN3": "DCE3", "T1-DYNA3": "DCE3",
     "动态增强3": "DCE3", "zengqiang３＼": "DCE3", "zengqiang3、": "DCE3", "zq3": "DCE3",
     "PH3": "DCE3",
+    "D3_jpeg": "DCE3",
     # DCE4
     "D4": "DCE4", "增强4": "DCE4", "T1-DYN4": "DCE4", "T1-DYNA4": "DCE4",
     "动态增强4": "DCE4", "zengqiang４": "DCE4", "zq4": "DCE4",
     "PH4": "DCE4",
+    "D4_jpeg": "DCE4",
     # DCE5
     "D5": "DCE5", "增强5": "DCE5", "T1-DYN5": "DCE5", "T1-DYNA5": "DCE5",
     "动态增强5": "DCE5", "zengqiang５": "DCE5", "zq5": "DCE5",
     "PH5": "DCE5",
+    "D5_jpeg": "DCE5",
     # DCE6
     "D6": "DCE6", "增强6": "DCE6", "T1-DYN6": "DCE6", "T1-DYNA6": "DCE6",
     "动态增强6": "DCE6", "zengqiang６": "DCE6", "zq6": "DCE6",
     "PH6": "DCE6",
+    "D6_jpeg": "DCE6",
     # DCE7
     "D7": "DCE7", "增强7": "DCE7", "T1-DYN7": "DCE7", "T1-DYNA7": "DCE7",
     "动态增强7": "DCE7", "zengqiang７": "DCE7", "zq7": "DCE7",
     "PH7": "DCE7",
+    "D7_jpeg": "DCE7",
+    # DCE8+ (extra phases beyond 7, map to DCE7 as the last standard phase)
+    "D8": "DCE7", "D9": "DCE7", "D10": "DCE7",
+    "PH8": "DCE7",
+    "T1-DYNA8": "DCE7", "T1-DYNA9": "DCE7", "T1-DYNA10": "DCE7",
+    "T1-DYNA11": "DCE7", "T1-DYNA12": "DCE7",
+    "zengqiang8": "DCE7", "zengqiang9": "DCE7",
+    "DYN-VIBRANT+C": "DCE7", "DYN VIBRANT+C": "DCE7",
+    "DYN-AX-VIBRANT+C": "DCE7", "DYN-VIBRATN+C": "DCE7",
+    "DYN-CIBRANT+C": "DCE7",
 }
-
 
 def clean_patient_id(dirname: str) -> str:
     """Extract clean patient_id from annotation directory name.

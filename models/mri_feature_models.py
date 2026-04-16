@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.dice_score import dice_loss
+from utils.dice_score import seg_loss as compute_seg_loss
 
 
 STANDARD_SEQUENCES = [
@@ -84,7 +84,7 @@ class SequenceEncoder(nn.Module):
             n = num_slices[b].item() if num_slices is not None else S
             valid = slices_weight[b, :n] > 0
             if torch.any(valid):
-                seg_losses.append(dice_loss(pred_mask[b, :n], gt_mask[b, :n], valid_mask=valid))
+                seg_losses.append(compute_seg_loss(pred_mask[b, :n], gt_mask[b, :n], valid_mask=valid))
         if seg_losses:
             seg_loss = torch.stack(seg_losses).mean()
         else:

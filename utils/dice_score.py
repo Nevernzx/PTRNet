@@ -69,4 +69,32 @@ def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False, valid_mas
     # Dice loss (objective to minimize) between 0 and 1
     fn = multiclass_dice_coeff if multiclass else dice_coeff
     return 1 - fn(input, target, reduce_batch_first=True, valid_mask=valid_mask)
+
+
+def seg_loss(input: Tensor, target: Tensor, valid_mask: Tensor = None,
+             focal_weight: float = 0.5, gamma: float = 2.0, alpha: float = 0.75):
+    """Combined Focal + Dice loss for sparse masks.
+
+    Focal loss up-weights hard/rare examples (positive pixels in sparse masks),
+    providing strong gradients even at initialization. Dice loss ensures global
+    overlap optimization.
+
+    Args:
+        alpha: weight for positive class (0.75 = 3x more weight on sparse positives)
+        gamma: focusing parameter (2.0 = standard focal loss)
+    """
+    input_flat, target_flat = _apply_valid_mask(input, target, valid_mask=valid_mask)
+    if input_flat.numel() == 0:
+        return input.new_zeros(())
+
+    # Focal loss
+    p = input_flat.clamp(1e-6, 1 - 1e-6)
+    ce = -target_flat * torch.log(p) - (1 - target_flat) * torch.log(1 - p)
+    p_t = target_flat * p + (1 - target_flat) * (1 - p)
+    alpha_t = target_flat * alpha + (1 - target_flat) * (1 - alpha)
+    focal = alpha_t * (1 - p_t) ** gamma * ce
+    focal_loss = focal.mean()
+
+    d_loss = 1 - dice_coeff(input_flat, target_flat, reduce_batch_first=True)
+    return focal_weight * focal_loss + (1 - focal_weight) * d_loss
     # return 1 - fn(input, target, reduce_batch_first=False)

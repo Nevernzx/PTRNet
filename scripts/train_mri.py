@@ -40,7 +40,7 @@ def get_arguments():
     parser.add_argument("--base_lr", type=float, default=1.2e-3)
     parser.add_argument("--init_lr", type=float, default=1e-7)
     parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--num_workers", type=int, default=0)
+    parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
     parser.add_argument("--gpu", type=str, default="0")
     parser.add_argument("--seed", type=int, default=3407)
@@ -182,6 +182,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, args, epoch
             loss = cls_loss + args.seg_loss_weight * seg_loss
 
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
 
         running_loss += loss.item()
