@@ -37,9 +37,9 @@ def get_arguments():
     parser.add_argument("--feature_dir", type=str, default="/data/MRI_data/standardized/features/BiomedCLIP")
     parser.add_argument("--dataset_csv", type=str, default="/data/MRI_data/standardized/dataset.csv")
     parser.add_argument("--num_epochs", type=int, default=60)
-    parser.add_argument("--base_lr", type=float, default=3e-4)
+    parser.add_argument("--base_lr", type=float, default=1.2e-3)
     parser.add_argument("--init_lr", type=float, default=1e-7)
-    parser.add_argument("--batch_size", type=int, default=1)
+    parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
     parser.add_argument("--gpu", type=str, default="0")
@@ -56,6 +56,7 @@ def get_arguments():
     parser.add_argument("--val_ratio", type=float, default=0.15)
     parser.add_argument("--test_ratio", type=float, default=0.15)
     parser.add_argument("--split_seed", type=int, default=3407)
+    parser.add_argument("--max_slices", type=int, default=96)
     return parser.parse_args()
 
 
@@ -164,17 +165,19 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, args, epoch
 
     tbar = tqdm(dataloader)
     for step, batch in enumerate(tbar):
-        labels, x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask = prepare_batch(batch, device)
+        labels, x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask, seq_presence, seq_num_slices = prepare_batch(batch, device)
 
         optimizer.zero_grad()
 
         if args.model_mode == "tabular":
-            logits = model(x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask, mode="train")
+            logits = model(x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask,
+                           mode="train", seq_presence=seq_presence, seq_num_slices=seq_num_slices)
             cls_loss = criterion(logits, labels)
             seg_loss = cls_loss.new_zeros(())
             loss = cls_loss
         else:
-            logits, seg_loss = model(x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask, mode="train")
+            logits, seg_loss = model(x_categ, x_numer, img_data, inner_slice_mask, inter_slice_mask,
+                                     mode="train", seq_presence=seq_presence, seq_num_slices=seq_num_slices)
             cls_loss = criterion(logits, labels)
             loss = cls_loss + args.seg_loss_weight * seg_loss
 

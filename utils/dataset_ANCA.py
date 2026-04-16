@@ -34,6 +34,7 @@ class ANCAdataset(data.Dataset):
         val_ratio=0.15,
         test_ratio=0.15,
         sequences=None,
+        max_slices=96,
     ):
         self.root = root
         self.csv_path = csv_path
@@ -43,6 +44,7 @@ class ANCAdataset(data.Dataset):
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.sequences = sequences or STANDARD_SEQUENCES
+        self.max_slices = max_slices
         self.name = None
         self.file_id = None
 
@@ -69,9 +71,21 @@ class ANCAdataset(data.Dataset):
                     continue
 
                 seq_data = feature_data[seq]
-                img_data[seq] = seq_data["patch_embed"].float()
-                inner_slice_mask[seq] = seq_data["mask_attention"].float()
-                inter_slice_mask[seq] = seq_data["slices_weight"].float()
+                pe = seq_data["patch_embed"].float()
+                ma = seq_data["mask_attention"].float()
+                sw = seq_data["slices_weight"].float()
+
+                # Uniformly subsample if exceeding max_slices
+                n = pe.shape[0]
+                if self.max_slices and n > self.max_slices:
+                    indices = torch.linspace(0, n - 1, self.max_slices).long()
+                    pe = pe[indices]
+                    ma = ma[indices]
+                    sw = sw[indices]
+
+                img_data[seq] = pe
+                inner_slice_mask[seq] = ma
+                inter_slice_mask[seq] = sw
 
             x_categ = torch.zeros(4, dtype=torch.long)
             x_numer = torch.zeros(23, dtype=torch.float32)
